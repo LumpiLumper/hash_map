@@ -136,6 +136,10 @@ HashMap* rehash(HashMap *hash_map){
     int actual_max_overflow = get_max_overflow(hash_map);
     HashMap *rehashed_map = NULL;
     int map_size = hash_map->size;
+    if(actual_max_overflow <= target_max_overflow){
+        free(rehashed_map);
+        return hash_map;
+    }
     while(actual_max_overflow > target_max_overflow){
         map_size = map_size + map_size / 2;
         if(rehashed_map) destroy_hash_map(rehashed_map);
