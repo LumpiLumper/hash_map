@@ -57,7 +57,9 @@ int main(void)
 
     /* overwrite data saved at key */
     write_to_map(map, 5, 3);
+    write_to_map(map, 15, 100);
     check_found("read data at key=5 after overwriting", read_from_map(map, 5), 5, 3);
+    check_found("read data at key=15 after overwriting", read_from_map(map, 15), 5, 100);
 
     /* collision: 3, 13, 23 all hash to slot 3 */
     write_to_map(map, 13, 3);
@@ -79,6 +81,17 @@ int main(void)
     check_found("read key=-17", read_from_map(map, -100), 0, 255);
     check_not_found("read key=-10", read_from_map(map, -10));
     check_not_found("read key=-99", read_from_map(map, -99));
+
+    /* delete key form hash map */
+    delete_from_map(map, -1);
+    delete_from_map(map, 15);
+    check_not_found("read key=-1 after deleting", read_from_map(map, -1));
+    check_not_found("read key=15 after deleting", read_from_map(map, 15));
+
+    write_to_map(map, 15, -100);
+    delete_from_map(map, 5);
+    check_found("read key=15 after adding it again collision key=5 deleted", read_from_map(map, 15), 5, -100);
+    check_not_found("read key=5 after deleting", read_from_map(map, 5));
 
     
     printf("\n%d passed, %d failed\n", passed, failed);

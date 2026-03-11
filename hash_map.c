@@ -64,13 +64,29 @@ void write_to_map(HashMap *hash_map, int key, long data){
     free(check_key);
 }
 
+void delete_from_map(HashMap *hash_map, int key){
+    int h = hash(hash_map, key);
+    HashSlot *hash_slot = &hash_map->map[h];
+    int *check_key = malloc(2 * sizeof(int));
+
+    check_key = key_in_hash_slot(hash_slot, key, check_key);
+    if(!check_key[0]) return;
+    for(int i = check_key[1] + 1; i < hash_slot->overflow_size; i++){
+        hash_slot->overflow[i-1] = hash_slot->overflow[i];
+    }
+    hash_slot->overflow_size -= 1;
+    hash_slot->overflow = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+    if(hash_slot->overflow_size == 0) hash_slot->used = false;
+    free(check_key);
+}
+
 /*
 if key is found in overflow, check_key will be 1 at pos 0 to indicate that the key has been
 found, in pos 1, index of slot with key is stored.
 If key was not found, pos 0 will be 0.
 !! don't forget to free check_key after check is over !!
 */
-int* key_in_hash_slot(HashSlot *hash_slot, int key, int *check_key) {
+int* key_in_hash_slot(HashSlot *hash_slot, int key, int *check_key){
     for(int i = 0; i < hash_slot->overflow_size; i++){
         if(hash_slot->overflow[i].key == key){
             check_key[0] = 1;

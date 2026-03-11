@@ -25,6 +25,7 @@ HashMap* create_hash_map(int size);
 void destroy_hash_map(HashMap *hash_map);
 int hash(HashMap *hash_map, int key);
 void write_to_map(HashMap *hash_map, int key, long data);
+void delete_from_map(HashMap *hash_map, int key);
 int* key_in_hash_slot(HashSlot *hash_slot, int key, int *check_key);
 Slot read_from_map(HashMap *hash_map, int key);
 
