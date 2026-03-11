@@ -156,3 +156,33 @@ void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_doner_map){
         }
     }
 }
+
+void print_shape_map(HashMap *hash_map){
+    printf("---- Shape of Map ----\n");
+    for(int i = 0; i < hash_map->size; i++){
+        int overflow_size = hash_map->map[i].overflow_size;
+        printf("Hashslot [%d]: overflow: [%d]\n", i, overflow_size);
+    }
+}
+
+void print_map(HashMap *hash_map){
+    printf("-------- Map --------\n");
+    for(int i = 0; i < hash_map->size; i++){
+        int overflow_size = hash_map->map[i].overflow_size;
+        printf("Hashslot[%d]:\n", i);
+        if(overflow_size > 0){
+            for(int u = 0; u < overflow_size; u++){
+                int key = hash_map->map[i].overflow[u].key;
+                int data = hash_map->map[i].overflow[u].data;
+                int idx = hash_map->map[i].overflow[u].idx;
+                int used = hash_map->map[i].overflow[u].used;
+                printf("Subslot[%d]: Key[%d]; Data[%d]; Index[%d]; Used[%d]\n",
+                        u, key, data, idx, used);
+            }
+            printf("\n");
+        }
+        else{
+            printf("No Subslots\n\n");
+        }
+    }
+}
