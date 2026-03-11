@@ -39,9 +39,9 @@ int main(void)
     HashMap *map = create_hash_map(10);
 
     /* basic write and read */
-    write_to_map(map, 5, -3);
-    write_to_map(map, 3, 4);
-    write_to_map(map, 7, 7);
+    write_to_map(map, 5, (void*)(long)-3);
+    write_to_map(map, 3, (void*)(long)4);
+    write_to_map(map, 7, (void*)(long)7);
 
     check_found("read key=5", read_from_map(map, 5), 5, -3);
     check_found("read key=3", read_from_map(map, 3), 3, 4);
@@ -51,19 +51,19 @@ int main(void)
     check_not_found("read key=99 (not inserted)", read_from_map(map, 99));
 
     /* collision: 5 and 15 both hash to slot 5 with size=10 */
-    write_to_map(map, 15, 157);
+    write_to_map(map, 15, (void*)(long)157);
     check_found("read key=5  after collision", read_from_map(map, 5),  5, -3);
     check_found("read key=15 after collision", read_from_map(map, 15), 5, 157);
 
     /* overwrite data saved at key */
-    write_to_map(map, 5, 3);
-    write_to_map(map, 15, 100);
+    write_to_map(map, 5, (void*)(long)3);
+    write_to_map(map, 15, (void*)(long)100);
     check_found("read data at key=5 after overwriting", read_from_map(map, 5), 5, 3);
     check_found("read data at key=15 after overwriting", read_from_map(map, 15), 5, 100);
 
     /* collision: 3, 13, 23 all hash to slot 3 */
-    write_to_map(map, 13, 3);
-    write_to_map(map, 23, -157);
+    write_to_map(map, 13, (void*)(long)3);
+    write_to_map(map, 23, (void*)(long)-157);
     check_found("read key=3",  read_from_map(map, 3),  3, 4);
     check_found("read key=13", read_from_map(map, 13), 3, 3);
     check_found("read key=23", read_from_map(map, 23), 3, -157);
@@ -73,9 +73,9 @@ int main(void)
     check_found("read key=0", read_from_map(map, 0), 0, 1);
 
     /* key negative numbers edge case*/
-    write_to_map(map, -1, 15);
-    write_to_map(map, -5, 6);
-    write_to_map(map, -100, 255);
+    write_to_map(map, -1, (void*)(long)15);
+    write_to_map(map, -5, (void*)(long)6);
+    write_to_map(map, -100, (void*)(long)255);
     check_found("read key=-1", read_from_map(map, -1), 1, 15);
     check_found("read key=-5", read_from_map(map, -5), 5, 6);
     check_found("read key=-17", read_from_map(map, -100), 0, 255);
@@ -88,7 +88,7 @@ int main(void)
     check_not_found("read key=-1 after deleting", read_from_map(map, -1));
     check_not_found("read key=15 after deleting", read_from_map(map, 15));
 
-    write_to_map(map, 15, -100);
+    write_to_map(map, 15, (void*)(long)-100);
     delete_from_map(map, 5);
     check_found("read key=15 after adding it again collision key=5 deleted", read_from_map(map, 15), 5, -100);
     check_not_found("read key=5 after deleting", read_from_map(map, 5));

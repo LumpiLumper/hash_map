@@ -34,7 +34,7 @@ from hashmap always returns an type Slot. If there is slot collision,
 a new overflow slot is created that stores the key.
 if statement is needed because overflow size is uninitialised when hash slot is created
 */
-void write_to_map(HashMap *hash_map, int key, long data){
+void write_to_map(HashMap *hash_map, int key, void* data){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
     int *check_key = malloc(2 * sizeof(int));
@@ -120,4 +120,39 @@ Slot read_from_map(HashMap *hash_map, int key){
     Slot slot;
     slot.used = false;
     return slot; // key not found
+}
+
+int get_max_overflow(HashMap *hash_map){
+    int max_overflow = 0;
+    for(int i = 0; i < hash_map->size; i++){
+        if(hash_map->map[i].overflow_size > max_overflow){
+            max_overflow = hash_map->map[i].overflow_size;
+        }
+    }
+    return max_overflow;
+}
+
+HashMap* rehash(HashMap *hash_map){
+    int target_max_overflow = 2;
+    int actual_max_overflow = get_max_overflow(hash_map);
+    HashMap *rehashed_map = malloc(sizeof(HashMap));
+    int map_size = hash_map->size;
+    while(actual_max_overflow > target_max_overflow){
+        map_size = map_size + map_size / 2;
+        rehashed_map = create_hash_map(map_size);
+        initialize_map_from_keys_in_map(rehashed_map, hash_map);
+        actual_max_overflow = get_max_overflow(rehashed_map);
+    }
+    free(hash_map);
+    return rehashed_map;
+}
+
+void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_doner_map){
+    for(int i = 0; i < key_doner_map->size; i++){
+        for(int u = 0; u < key_doner_map->map[i].overflow_size; u++){
+            write_to_map(new_map, 
+                         key_doner_map->map[i].overflow[u].key, 
+                         (void*)(long)key_doner_map->map[i].overflow[u].data);
+        }
+    }
 }
