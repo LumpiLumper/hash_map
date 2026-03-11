@@ -55,7 +55,7 @@ int main(void)
     check_found("read key=5  after collision", read_from_map(map, 5),  5, -3);
     check_found("read key=15 after collision", read_from_map(map, 15), 5, 157);
 
-    /* overwriting data at key */
+    /* overwrite data saved at key */
     write_to_map(map, 5, 3);
     check_found("read data at key=5 after overwriting", read_from_map(map, 5), 5, 3);
 
