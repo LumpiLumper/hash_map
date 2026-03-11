@@ -33,7 +33,7 @@ overflow so reading from hashmap always returns an type Slot. if there is slot c
 a new overflow slot is created that stores the key.
 if statement is needed because overflow size is uninitialised when hash slot is created
 */
-void write_to_map(HashMap *hash_map, int key, int data){
+void write_to_map(HashMap *hash_map, int key, long data){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
     if(!hash_slot->used){

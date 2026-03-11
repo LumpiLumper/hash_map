@@ -14,10 +14,10 @@ void check_found(const char *label, Slot result, int expected_idx, int expected_
         printf("[FAIL] %s  got=not found  expected idx=%d\n", label, expected_idx);
         failed++;
     } else if (result.idx == expected_idx && result.data == expected_data) {
-        printf("[PASS] %s  idx=%d, data=%d\n", label, result.idx, result.data);
+        printf("[PASS] %s  idx=%d, data=%ld\n", label, result.idx, result.data);
         passed++;
     } else {
-        printf("[FAIL] %s  got idx=%d  expected idx=%d, got data=%d expected data = %d\n", 
+        printf("[FAIL] %s  got idx=%d  expected idx=%d, got data=%ld expected data = %d\n", 
             label, result.idx, expected_idx, result.data, expected_data);
         failed++;
     }

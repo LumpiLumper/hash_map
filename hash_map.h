@@ -6,7 +6,7 @@
 typedef struct{
     int key;
     int idx;
-    int data;
+    long data;
     bool used;
 } Slot;
 
@@ -24,7 +24,7 @@ typedef struct{
 HashMap* create_hash_map(int size);
 void destroy_hash_map(HashMap *hash_map);
 int hash(HashMap *hash_map, int key);
-void write_to_map(HashMap *hash_map, int key, int data);
+void write_to_map(HashMap *hash_map, int key, long data);
 Slot read_from_map(HashMap *hash_map, int key);
 
 #endif
