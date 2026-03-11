@@ -29,7 +29,7 @@ void delete_from_map(HashMap *hash_map, int key);
 int* key_in_hash_slot(HashSlot *hash_slot, int key, int *check_key);
 Slot read_from_map(HashMap *hash_map, int key);
 HashMap* rehash(HashMap *hash_map);
-void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_doner_map);
+void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map);
 void print_shape_map(HashMap *hash_map);
 void print_map(HashMap *hash_map);
 

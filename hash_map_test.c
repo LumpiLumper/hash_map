@@ -114,9 +114,17 @@ int main(void)
 
     print_map(map);
 
-
-
+    /* find keys in rehashed map */
+    check_found("read key=0", read_from_map(map, 0), 0, 1);
+    check_found("read key=15", read_from_map(map, 15), 0, -100);
+    check_found("read key=3", read_from_map(map, 3), 3, 4);
+    check_found("read key=-5", read_from_map(map, -5), 5, 6);
+    check_found("read key=7", read_from_map(map, 7), 7, 7);
+    check_found("read key=23", read_from_map(map, 23), 8, -157);
+    check_found("read key=-100", read_from_map(map, -100), 10, 255);
+    check_found("read key=13", read_from_map(map, 13), 13, 3);
 
     printf("\n%d passed, %d failed\n", passed, failed);
+    destroy_hash_map(map);
     return failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }

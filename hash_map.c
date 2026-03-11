@@ -135,24 +135,25 @@ int get_max_overflow(HashMap *hash_map){
 HashMap* rehash(HashMap *hash_map){
     int target_max_overflow = 2;
     int actual_max_overflow = get_max_overflow(hash_map);
-    HashMap *rehashed_map = malloc(sizeof(HashMap));
+    HashMap *rehashed_map = NULL;
     int map_size = hash_map->size;
     while(actual_max_overflow > target_max_overflow){
         map_size = map_size + map_size / 2;
+        if(rehashed_map) destroy_hash_map(rehashed_map);
         rehashed_map = create_hash_map(map_size);
         initialize_map_from_keys_in_map(rehashed_map, hash_map);
         actual_max_overflow = get_max_overflow(rehashed_map);
     }
-    free(hash_map);
+    destroy_hash_map(hash_map);
     return rehashed_map;
 }
 
-void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_doner_map){
-    for(int i = 0; i < key_doner_map->size; i++){
-        for(int u = 0; u < key_doner_map->map[i].overflow_size; u++){
+void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map){
+    for(int i = 0; i < key_donor_map->size; i++){
+        for(int u = 0; u < key_donor_map->map[i].overflow_size; u++){
             write_to_map(new_map, 
-                         key_doner_map->map[i].overflow[u].key, 
-                         (void*)(long)key_doner_map->map[i].overflow[u].data);
+                         key_donor_map->map[i].overflow[u].key, 
+                         (void*)(long)key_donor_map->map[i].overflow[u].data);
         }
     }
 }
@@ -173,10 +174,10 @@ void print_map(HashMap *hash_map){
         if(overflow_size > 0){
             for(int u = 0; u < overflow_size; u++){
                 int key = hash_map->map[i].overflow[u].key;
-                int data = hash_map->map[i].overflow[u].data;
+                long data = (long)hash_map->map[i].overflow[u].data;
                 int idx = hash_map->map[i].overflow[u].idx;
                 int used = hash_map->map[i].overflow[u].used;
-                printf("Subslot[%d]: Key[%d]; Data[%d]; Index[%d]; Used[%d]\n",
+                printf("Subslot[%d]: Key[%d]; Data[%ld]; Index[%d]; Used[%d]\n",
                         u, key, data, idx, used);
             }
             printf("\n");
