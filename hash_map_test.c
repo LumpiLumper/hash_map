@@ -1,9 +1,9 @@
 // gcc -o hash_map_test hash_map_test.c hash_map.c && ./hash_map_test
 
 #include "hash_map.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 static int passed = 0;
 static int failed = 0;
