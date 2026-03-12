@@ -6,9 +6,19 @@
 #include <string.h>
 #include <stddef.h>
 
+
+#ifdef TESTING
+    #include "test_alloc.h"
+    #define MALLOC test_malloc
+    #define REALLOC test_realloc
+#else
+    #define MALLOC malloc
+    #define REALLOC realloc
+#endif
+
 HashMap* create_hash_map(int size){
-    HashMap *hash_map = malloc(sizeof(HashMap));
-    hash_map->map = malloc(size * sizeof(HashSlot));
+    HashMap *hash_map = MALLOC(sizeof(HashMap));
+    hash_map->map = MALLOC(size * sizeof(HashSlot));
     memset(hash_map->map, 0, size * sizeof(HashSlot));
     hash_map->size = size;
     return hash_map;
@@ -37,7 +47,7 @@ if statement is needed because overflow size is uninitialised when hash slot is 
 HashMapError write_to_map(HashMap *hash_map, int key, void* data){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
-    int *check_key = malloc(2 * sizeof(int));
+    int *check_key = MALLOC(2 * sizeof(int));
     if(alloc_error(check_key)){
         free(check_key);
         return HASH_MAP_ERR_ALLOC;
@@ -45,12 +55,13 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
     int overflow_idx;
     
     if(!hash_slot->used) {
-        hash_slot->overflow_size = 1;
-        void *tmp = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+        int tmp_overflow_size = 1;
+        void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
         if(alloc_error(tmp)){
             free(check_key);
             return HASH_MAP_ERR_ALLOC;
         }
+        hash_slot->overflow_size = tmp_overflow_size;
         hash_slot->overflow = tmp;
         overflow_idx = 0;
         hash_slot->used = true;
@@ -61,12 +72,13 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
             overflow_idx = check_key[1];
         }
         else{
-            hash_slot->overflow_size += 1;
-            void *tmp = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+            int tmp_overflow_size = hash_slot->overflow_size + 1;
+            void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
             if(alloc_error(tmp)){
                 free(check_key);
                 return HASH_MAP_ERR_ALLOC;
             }
+            hash_slot->overflow_size = tmp_overflow_size;
             hash_slot->overflow = tmp;
             overflow_idx = hash_slot->overflow_size - 1;
         }
@@ -82,7 +94,7 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
 HashMapError delete_from_map(HashMap *hash_map, int key){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
-    int *check_key = malloc(2 * sizeof(int));
+    int *check_key = MALLOC(2 * sizeof(int));
     if(alloc_error(check_key)){
         free(check_key);
         return HASH_MAP_ERR_ALLOC;
@@ -102,7 +114,7 @@ HashMapError delete_from_map(HashMap *hash_map, int key){
         hash_slot->used = false;
     }
     else {
-        void *tmp = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+        void *tmp = REALLOC(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
         if(alloc_error(tmp)){
             hash_slot->overflow_size += 1; // realloc failed -> size of overflow did not change, correct overflow size
             free(check_key);               // realloc's to smaller size -> should never fail
