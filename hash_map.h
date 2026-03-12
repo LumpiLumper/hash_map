@@ -2,6 +2,7 @@
 #define HASH_MAP_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct{
     int key;
@@ -32,5 +33,6 @@ HashMap* rehash(HashMap *hash_map);
 void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map);
 void print_shape_map(HashMap *hash_map);
 void print_map(HashMap *hash_map);
+void* safe_realloc(void *ptr, size_t size);
 
     #endif

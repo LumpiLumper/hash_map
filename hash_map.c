@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 
 HashMap* create_hash_map(int size){
     HashMap *hash_map = malloc(sizeof(HashMap));
