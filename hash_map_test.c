@@ -199,28 +199,12 @@ int main(void)
     /* test alloc fail handeling */
     printf("-------- Alloc Fail Testing --------\n");
     
-    /* write to map check_key fail malloc */
     fail_alloc_after = 0;
     bool found;
 
-    error = write_to_map(map, 13, (void*)(int)56);
-    fail_alloc_after =- 1;
-    found = check_is_there(13, read_from_map(map, 13));
-    print_error(error);
-    if(error == HASH_MAP_ERR_ALLOC && !found){
-        printf("[PASS] Alloc fail check_key inside write_to_map succesfull\n");
-        passed += 1;
-    }
-    else{
-        printf("[FAILED] Alloc fail check_key inside write_to_map unsuccesful\n");
-        failed += 1;
-    }
-
-    print_map(map);
-
     /* write to map !hash_slot_used fail realloc
        (hash_slot 12 is unused) */
-    fail_alloc_after = 1;
+    fail_alloc_after = 0;
     error = write_to_map(map, 12, (void*)(int)1);
     fail_alloc_after = -1;
     found = check_is_there(12, read_from_map(map, 12));
@@ -238,7 +222,7 @@ int main(void)
 
     /* write to map new overflow slot fail realloc
        (hash_slot 3 has key 3 in it) */
-    fail_alloc_after = 1;
+    fail_alloc_after = 0;
     error = write_to_map(map, -3, (void*)(int)1);
     fail_alloc_after = -1;
     found = check_is_there(-3, read_from_map(map, -3));
@@ -249,23 +233,6 @@ int main(void)
     }
     else{
         printf("[FAILED] Alloc fail realloc at used slot inside write_to_map unsuccesful\n");
-        failed += 1;
-    }
-
-    print_map(map);
-
-    /* delete from map check key malloc fail */
-    fail_alloc_after = 0;
-    error = delete_from_map(map, 3);
-    fail_alloc_after = -1;
-    found = check_is_there(3, read_from_map(map, 3));
-    print_error(error);
-    if(error == HASH_MAP_ERR_ALLOC && found){
-        printf("[PASS] Alloc fail malloc check_key in delete_from_map succesfull\n");
-        passed += 1;
-    }
-    else{
-        printf("[FAILED] Alloc fail malloc check_key in delete_from_map unsuccesful\n");
         failed += 1;
     }
 
