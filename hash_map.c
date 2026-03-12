@@ -106,10 +106,9 @@ HashMapError delete_from_map(HashMap *hash_map, int key){
         free(check_key);
         return HASH_MAP_OK;
     }
-    // use temporary size to not touch slot unless alloc successful
     hash_slot->overflow_size -= 1;
     if(hash_slot->overflow_size <= 0){          // realloc(..., 0 * sizeof(size_t)) is a memory leak
-        hash_slot->overflow_size = 0;    // that's why we free overflow when size drops to zero
+        hash_slot->overflow_size = 0;           // that's why we free overflow when size drops to zero
         free(hash_slot->overflow);
         hash_slot->overflow = NULL;
         hash_slot->used = false;

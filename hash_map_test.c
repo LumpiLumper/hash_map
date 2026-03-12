@@ -204,7 +204,7 @@ int main(void)
     bool found;
 
     error = write_to_map(map, 13, (void*)(int)56);
-    fail_alloc_after - 1;
+    fail_alloc_after =- 1;
     found = check_is_there(13, read_from_map(map, 13));
     print_error(error);
     if(error == HASH_MAP_ERR_ALLOC && !found){
