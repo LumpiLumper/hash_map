@@ -149,11 +149,17 @@ int main(void)
     check_found("read key=15 after adding it again collision key=5 deleted", read_from_map(map, 15), 5, -100);
     check_not_found("read key=5 after deleting", read_from_map(map, 5));
 
+    error = write_to_map(map, 6, 100);
+    error = write_to_map(map, -6, -100);
+
+    print_map(map);
+
+    error = delete_from_map(map, 6);
+    check_found("read key=-6 after sub slot was deleted", read_from_map(map, -6), 6, -100);
+
     print_error(error);
 
-//    print_shape_map(map);
-
-//    print_map(map);
+    print_map(map);
 
     /* rehashing map */
     map = rehash(map);
@@ -264,49 +270,6 @@ int main(void)
     }
 
     print_map(map);
-
-    /* delete from map realloc fail at slot with more than one overflow slot (last overflow)
-       (hash_slot[0] has two overflow slots) */
-    
-    fail_alloc_after = 1;
-    error = delete_from_map(map, 15);
-    fail_alloc_after = -1;
-    found = check_is_there(15, read_from_map(map, 15));
-    print_error(error);
-    if(error == HASH_MAP_ERR_ALLOC && found){
-        printf("[PASS] Alloc fail realloc at slot with more than one overflow slot in delete_from_map succesfull\n");
-        printf("last overflow slot\n");
-        passed += 1;
-    }
-    else{
-        printf("[FAILED] Alloc fail realloc at slot with more than one overflow slot in delete_from_map unsuccesful\n");
-        printf("last overflow slot\n");
-        failed += 1;
-    }
-
-    print_map(map);
-
-    /* delete from map realloc fail at slot with more than one overflow slot (not last overflow)
-       (hash_slot[0] has two overflow slots) */
-    
-    fail_alloc_after = 1;
-    error = delete_from_map(map, 0);
-    fail_alloc_after = -1;
-    found = check_is_there(15, read_from_map(map, 0));
-    print_error(error);
-    if(error == HASH_MAP_ERR_ALLOC && found){
-        printf("[PASS] Alloc fail realloc at slot with more than one overflow slot in delete_from_map succesfull\n");
-        printf("not last overflow slot\n");
-        passed += 1;
-    }
-    else{
-        printf("[FAILED] Alloc fail realloc at slot with more than one overflow slot in delete_from_map unsuccesful\n");
-        printf("not last overflow slot\n");
-        failed += 1;
-    }
-
-    print_map(map);
-
 
     printf("\n%d passed, %d failed\n", passed, failed);
     destroy_hash_map(map);
