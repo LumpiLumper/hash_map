@@ -41,7 +41,7 @@ void write_to_map(HashMap *hash_map, int key, void* data){
     
     if(!hash_slot->used) {
         hash_slot->overflow_size = 1;
-        hash_slot->overflow = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+        hash_slot->overflow = safe_realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
         overflow_idx = 0;
         hash_slot->used = true;
     }
@@ -52,7 +52,7 @@ void write_to_map(HashMap *hash_map, int key, void* data){
         }
         else{
             hash_slot->overflow_size += 1;
-            hash_slot->overflow = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+            hash_slot->overflow = safe_realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
             overflow_idx = hash_slot->overflow_size - 1;
         }
     }
@@ -83,7 +83,7 @@ void delete_from_map(HashMap *hash_map, int key){
         hash_slot->used = false;
     }
     else {
-        hash_slot->overflow = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+        hash_slot->overflow = safe_realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
     }
     free(check_key);
 }
