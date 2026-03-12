@@ -65,7 +65,6 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
         key_in_hash_slot(hash_slot, key, &hash_map->key_checker);
         if(hash_map->key_checker.key_found) {
             overflow_idx = hash_map->key_checker.overflow_idx;
-            printf("overflow_index=%d\n", overflow_idx);
         }
         else{
             // use temporary sizes that drop when alloc fails -> map only changes when alloc succeedes
