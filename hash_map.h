@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+typedef enum {
+    HASH_MAP_OK = 0,
+    HASH_MAP_NOT_FOUND,
+    HASH_MAP_ERR_ALLOC
+} HashMapError;
+
 typedef struct{
     int key;
     int idx;
@@ -25,15 +31,14 @@ typedef struct{
 HashMap* create_hash_map(int size);
 void destroy_hash_map(HashMap *hash_map);
 int hash(HashMap *hash_map, int key);
-void write_to_map(HashMap *hash_map, int key, void* data);
-void delete_from_map(HashMap *hash_map, int key);
+HashMapError write_to_map(HashMap *hash_map, int key, void* data);
+HashMapError delete_from_map(HashMap *hash_map, int key);
 int* key_in_hash_slot(HashSlot *hash_slot, int key, int *check_key);
 Slot read_from_map(HashMap *hash_map, int key);
 HashMap* rehash(HashMap *hash_map);
-void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map);
+HashMapError initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map);
 void print_shape_map(HashMap *hash_map);
 void print_map(HashMap *hash_map);
-void* safe_realloc(void *ptr, size_t size);
-void* safe_malloc(size_t size);
+HashMapError alloc_error(void *ptr);
 
 #endif
