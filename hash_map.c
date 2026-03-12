@@ -7,8 +7,8 @@
 #include <stddef.h>
 
 HashMap* create_hash_map(int size){
-    HashMap *hash_map = malloc(sizeof(HashMap));
-    hash_map->map = malloc(size * sizeof(HashSlot));
+    HashMap *hash_map = safe_malloc(sizeof(HashMap));
+    hash_map->map = safe_malloc(size * sizeof(HashSlot));
     memset(hash_map->map, 0, size * sizeof(HashSlot));
     hash_map->size = size;
     return hash_map;
@@ -37,7 +37,7 @@ if statement is needed because overflow size is uninitialised when hash slot is 
 void write_to_map(HashMap *hash_map, int key, void* data){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
-    int *check_key = malloc(2 * sizeof(int));
+    int *check_key = safe_malloc(2 * sizeof(int));
     int overflow_idx;
     
     if(!hash_slot->used) {
@@ -67,7 +67,7 @@ void write_to_map(HashMap *hash_map, int key, void* data){
 void delete_from_map(HashMap *hash_map, int key){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
-    int *check_key = malloc(2 * sizeof(int));
+    int *check_key = safe_malloc(2 * sizeof(int));
 
     check_key = key_in_hash_slot(hash_slot, key, check_key);
     if(!check_key[0]){ 
@@ -207,6 +207,16 @@ void* safe_realloc(void *ptr, size_t size){
         free(ptr);
         tmp = NULL;
         fprintf(stderr, "realloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return tmp;
+}
+
+void* safe_malloc(size_t size){
+    void *tmp = malloc(size);
+    if(!tmp){
+        free(tmp);
+        fprintf(stderr, "malloc failed\n");
         exit(EXIT_FAILURE);
     }
     return tmp;

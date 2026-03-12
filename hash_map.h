@@ -34,5 +34,6 @@ void initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map);
 void print_shape_map(HashMap *hash_map);
 void print_map(HashMap *hash_map);
 void* safe_realloc(void *ptr, size_t size);
+void* safe_malloc(size_t size);
 
-    #endif
+#endif
