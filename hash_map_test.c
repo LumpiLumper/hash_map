@@ -40,10 +40,10 @@ void print_error(HashMapError error){
             printf("Map Status: HASH_MAP_OK\n");
             break;
         case HASH_MAP_NOT_FOUND:
-            printf("Map Status: HASH_MAP_OK\n");
+            printf("Map Status: HASH_MAP_NOT_FOUND\n");
             break;
         case HASH_MAP_ERR_ALLOC:
-            printf("Map Status: HASH_MAP_OK\n");
+            printf("Map Status: HASH_MAP_ERR_ALLOC\n");
             break;
         default:
             break;
@@ -66,7 +66,7 @@ int main(void)
     check_found("read key=7", read_from_map(map, 7), 7, 7);
     print_error(error);
 
-    print_shape_map(map);
+    //print_shape_map(map);
 
     /* key not in map */
     check_not_found("read key=99 (not inserted)", read_from_map(map, 99));
@@ -76,7 +76,7 @@ int main(void)
     check_found("read key=15 after collision", read_from_map(map, 15), 5, 157);
     print_error(error);
 
-    print_shape_map(map);
+    //print_shape_map(map);
 
     /* overwrite data saved at key */
     error = write_to_map(map, 5, (void*)(long)3);
@@ -86,7 +86,7 @@ int main(void)
     
     print_error(error);
 
-    print_shape_map(map);
+    //print_shape_map(map);
 
     /* collision: 3, 13, 23 all hash to slot 3 */
     error = write_to_map(map, 13, (void*)(long)3);
@@ -97,7 +97,7 @@ int main(void)
 
     print_error(error);
 
-    print_shape_map(map);
+//    print_shape_map(map);
 
     /* key=0 edge case */
     error = write_to_map(map, 0, (void*)(int)1);
@@ -105,7 +105,7 @@ int main(void)
 
     print_error(error);
 
-    print_shape_map(map);
+//    print_shape_map(map);
 
     /* key negative numbers edge case*/
     error = write_to_map(map, -1, (void*)(long)15);
@@ -119,15 +119,15 @@ int main(void)
 
     print_error(error);
     
-    print_shape_map(map);
+//    print_shape_map(map);
 
     /* delete key form hash map */
     error = delete_from_map(map, -1);
+    print_error(error);
     error = delete_from_map(map, 15);
+    print_error(error);
     check_not_found("read key=-1 after deleting", read_from_map(map, -1));
     check_not_found("read key=15 after deleting", read_from_map(map, 15));
-
-    print_error(error);
 
     error = write_to_map(map, 15, (void*)(long)-100);
     error = delete_from_map(map, 5);
@@ -136,14 +136,14 @@ int main(void)
 
     print_error(error);
 
-    print_shape_map(map);
+//    print_shape_map(map);
 
-    print_map(map);
+//    print_map(map);
 
     /* rehashing map */
     map = rehash(map);
 
-    print_map(map);
+//    print_map(map);
 
     /* find keys in rehashed map */
     check_found("read key=0", read_from_map(map, 0), 0, 1);
@@ -158,7 +158,7 @@ int main(void)
     /* rehashing when no rehash possible */
     map = rehash(map);
 
-    print_map(map);
+//    print_map(map);
 
     check_found("read key=0", read_from_map(map, 0), 0, 1);
     check_found("read key=15", read_from_map(map, 15), 0, -100);
@@ -175,11 +175,11 @@ int main(void)
 
     print_error(error);
 
-    print_map(map);
+//    print_map(map);
 
     // write_to_map(map, 13, (void*)(int)56);
 
-    print_map(map);
+//    print_map(map);
 
 
     printf("\n%d passed, %d failed\n", passed, failed);

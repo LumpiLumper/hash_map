@@ -83,7 +83,7 @@ HashMapError delete_from_map(HashMap *hash_map, int key){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
     int *check_key = malloc(2 * sizeof(int));
-    if(alloc_error){
+    if(alloc_error(check_key)){
         free(check_key);
         return HASH_MAP_ERR_ALLOC;
     }
