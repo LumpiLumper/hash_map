@@ -55,6 +55,7 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
     int overflow_idx;
     
     if(!hash_slot->used) {
+        // use temporary sizes that drop when alloc fails -> map only changes when alloc succeedes
         int tmp_overflow_size = 1;
         void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
         if(alloc_error(tmp)){
@@ -72,6 +73,7 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
             overflow_idx = check_key[1];
         }
         else{
+            // use temporary sizes that drop when alloc fails -> map only changes when alloc succeedes
             int tmp_overflow_size = hash_slot->overflow_size + 1;
             void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
             if(alloc_error(tmp)){
@@ -104,22 +106,24 @@ HashMapError delete_from_map(HashMap *hash_map, int key){
         free(check_key);
         return HASH_MAP_OK;
     }
-    for(int i = check_key[1] + 1; i < hash_slot->overflow_size; i++){
-        hash_slot->overflow[i-1] = hash_slot->overflow[i];
-    }
-    hash_slot->overflow_size -= 1;
-    if(hash_slot->overflow_size == 0){ // realloc(..., 0 * sizeof(size_t)) is a memory leak
-        free(hash_slot->overflow);     // that's why we free overflow when size drops to zero
+    // use temporary size to not touch slot unless alloc successful
+    int tmp_overflow_size = hash_slot->overflow_size - 1;
+    if(tmp_overflow_size <= 0){          // realloc(..., 0 * sizeof(size_t)) is a memory leak
+        hash_slot->overflow_size = 0;    // that's why we free overflow when size drops to zero
+        free(hash_slot->overflow);
         hash_slot->overflow = NULL;
         hash_slot->used = false;
     }
     else {
-        void *tmp = REALLOC(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+        void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
         if(alloc_error(tmp)){
-            hash_slot->overflow_size += 1; // realloc failed -> size of overflow did not change, correct overflow size
-            free(check_key);               // realloc's to smaller size -> should never fail
+            free(check_key);
             return HASH_MAP_ERR_ALLOC;
         }
+        for(int i = check_key[1] + 1; i < hash_slot->overflow_size; i++){
+            hash_slot->overflow[i-1] = hash_slot->overflow[i];
+        }
+        hash_slot->overflow_size = tmp_overflow_size;
         hash_slot->overflow = tmp;
     }
     free(check_key);
