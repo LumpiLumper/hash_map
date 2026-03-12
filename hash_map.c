@@ -47,6 +47,7 @@ if statement is needed because overflow size is uninitialised when hash slot is 
 HashMapError write_to_map(HashMap *hash_map, int key, void* data){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
+    KeyChecker key_checker;
     int overflow_idx;
     
     if(!hash_slot->used) {
@@ -62,9 +63,9 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
         hash_slot->used = true;
     }
     else{
-        key_in_hash_slot(hash_slot, key, &hash_map->key_checker);
-        if(hash_map->key_checker.key_found) {
-            overflow_idx = hash_map->key_checker.overflow_idx;
+        key_in_hash_slot(hash_slot, key, &key_checker);
+        if(key_checker.key_found) {
+            overflow_idx = key_checker.overflow_idx;
         }
         else{
             // use temporary sizes that drop when alloc fails -> map only changes when alloc succeedes
@@ -88,8 +89,10 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
 HashMapError delete_from_map(HashMap *hash_map, int key){
     int h = hash(hash_map, key);
     HashSlot *hash_slot = &hash_map->map[h];
-    key_in_hash_slot(hash_slot, key, &hash_map->key_checker);
-    if(!hash_map->key_checker.key_found){ 
+    KeyChecker key_checker;
+
+    key_in_hash_slot(hash_slot, key, &key_checker);
+    if(!key_checker.key_found){ 
         return HASH_MAP_OK;
     }
     hash_slot->overflow_size -= 1;
@@ -100,7 +103,7 @@ HashMapError delete_from_map(HashMap *hash_map, int key){
         hash_slot->used = false;
     }
     else {
-        for(int i = hash_map->key_checker.overflow_idx + 1; i < hash_slot->overflow_size + 1; i++){
+        for(int i = key_checker.overflow_idx + 1; i < hash_slot->overflow_size + 1; i++){
             hash_slot->overflow[i-1] = hash_slot->overflow[i];
         }
         /* no realloc fail check because realloc to smaller size than before, can never fail. 
@@ -112,12 +115,6 @@ HashMapError delete_from_map(HashMap *hash_map, int key){
     return HASH_MAP_OK;
 }
 
-/*
-if key is found in overflow, check_key will be 1 at pos 0 to indicate that the key has been
-found, in pos 1, index of slot with key is stored.
-If key was not found, pos 0 will be 0.
-!! don't forget to free check_key after check is over !!
-*/
 void key_in_hash_slot(HashSlot *hash_slot, int key, KeyChecker *key_checker){
     for(int i = 0; i < hash_slot->overflow_size; i++){
         if(hash_slot->overflow[i].key == key){
@@ -171,7 +168,6 @@ HashMap* rehash(HashMap *hash_map){
     HashMap *rehashed_map = NULL;
     int map_size = hash_map->size;
     if(actual_max_overflow <= target_max_overflow){
-        free(rehashed_map);
         return hash_map;
     }
     while(actual_max_overflow > target_max_overflow){

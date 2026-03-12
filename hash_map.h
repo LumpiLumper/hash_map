@@ -31,7 +31,6 @@ typedef struct{
 typedef struct{
     HashSlot *map;
     int size;
-    KeyChecker key_checker;
 } HashMap;
 
 HashMap* create_hash_map(int size);
