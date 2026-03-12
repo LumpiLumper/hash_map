@@ -69,13 +69,22 @@ void delete_from_map(HashMap *hash_map, int key){
     int *check_key = malloc(2 * sizeof(int));
 
     check_key = key_in_hash_slot(hash_slot, key, check_key);
-    if(!check_key[0]) return;
+    if(!check_key[0]){ 
+        free(check_key);
+        return;
+    }
     for(int i = check_key[1] + 1; i < hash_slot->overflow_size; i++){
         hash_slot->overflow[i-1] = hash_slot->overflow[i];
     }
     hash_slot->overflow_size -= 1;
-    hash_slot->overflow = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
-    if(hash_slot->overflow_size == 0) hash_slot->used = false;
+    if(hash_slot->overflow_size == 0){ // realloc(..., 0 * sizeof(size_t)) is a memory leak
+        free(hash_slot->overflow);     // that's why we free overflow when size drops to zero
+        hash_slot->overflow = NULL;
+        hash_slot->used = false;
+    }
+    else {
+        hash_slot->overflow = realloc(hash_slot->overflow, hash_slot->overflow_size * sizeof(Slot));
+    }
     free(check_key);
 }
 
@@ -189,4 +198,15 @@ void print_map(HashMap *hash_map){
             printf("No Subslots\n\n");
         }
     }
+}
+
+void* safe_realloc(void *ptr, size_t size){
+    void *tmp = realloc(ptr, size);
+    if (!tmp){
+        free(ptr);
+        tmp = NULL;
+        fprintf(stderr, "realloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return tmp;
 }

@@ -138,6 +138,17 @@ int main(void)
     check_found("read key=-100", read_from_map(map, -100), 10, 255);
     check_found("read key=13", read_from_map(map, 13), 13, 3);
 
+    /* empty overflow (reduce overflow to 0 * sizeof(int)) */
+    delete_from_map(map, 13);
+    delete_from_map(map, 13);
+
+    print_map(map);
+
+    // write_to_map(map, 13, (void*)(int)56);
+
+    print_map(map);
+
+
     printf("\n%d passed, %d failed\n", passed, failed);
     destroy_hash_map(map);
     return failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
