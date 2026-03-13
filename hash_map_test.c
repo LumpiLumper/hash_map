@@ -33,7 +33,7 @@ bool check_is_there(int key, Slot result){
         return false;
     }
     else{
-        printf("[FOUND] Key=%d found at idx=%d with data=%d \n", key, result.idx, (int)result.data);
+        printf("[FOUND] Key=%d found at idx=%d with data=%p \n", key, result.idx, result.data);
         return true;
     }
 }
@@ -149,8 +149,8 @@ int main(void)
     check_found("read key=15 after adding it again collision key=5 deleted", read_from_map(map, 15), 5, -100);
     check_not_found("read key=5 after deleting", read_from_map(map, 5));
 
-    error = write_to_map(map, 6, 100);
-    error = write_to_map(map, -6, -100);
+    error = write_to_map(map, 6, (void*)(int)100);
+    error = write_to_map(map, -6, (void*)(int)-100);
 
     print_map(map);
 

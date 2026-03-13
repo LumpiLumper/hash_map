@@ -44,6 +44,6 @@ HashMap* rehash(HashMap *hash_map);
 HashMapError initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_donor_map);
 void print_shape_map(HashMap *hash_map);
 void print_map(HashMap *hash_map);
-HashMapError alloc_error(void *ptr);
+bool alloc_failed(void *ptr);
 
 #endif

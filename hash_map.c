@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 
 #ifdef TESTING
@@ -54,7 +55,7 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
         // use temporary sizes that drop when alloc fails -> map only changes when alloc succeedes
         int tmp_overflow_size = 1;
         void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
-        if(alloc_error(tmp)){
+        if(alloc_failed(tmp)){
             return HASH_MAP_ERR_ALLOC;
         }
         hash_slot->overflow_size = tmp_overflow_size;
@@ -71,7 +72,7 @@ HashMapError write_to_map(HashMap *hash_map, int key, void* data){
             // use temporary sizes that drop when alloc fails -> map only changes when alloc succeedes
             int tmp_overflow_size = hash_slot->overflow_size + 1;
             void *tmp = REALLOC(hash_slot->overflow, tmp_overflow_size * sizeof(Slot));
-            if(alloc_error(tmp)){
+            if(alloc_failed(tmp)){
                 return HASH_MAP_ERR_ALLOC;
             }
             hash_slot->overflow_size = tmp_overflow_size;
@@ -191,7 +192,7 @@ HashMapError initialize_map_from_keys_in_map(HashMap *new_map, HashMap *key_dono
         for(int u = 0; u < key_donor_map->map[i].overflow_size; u++){
             error = write_to_map(new_map, 
                                  key_donor_map->map[i].overflow[u].key, 
-                                 (void*)(long)key_donor_map->map[i].overflow[u].data);
+                                 (void*)key_donor_map->map[i].overflow[u].data);
             if(error){
                 return HASH_MAP_ERR_ALLOC;
             }
@@ -230,9 +231,9 @@ void print_map(HashMap *hash_map){
     }
 }
 
-HashMapError alloc_error(void *ptr){
+bool alloc_failed(void *ptr){
     if(ptr){
-        return HASH_MAP_OK;
+        return false;
     }
-    return HASH_MAP_ERR_ALLOC;
+    return true;
 }
