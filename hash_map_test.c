@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 static int passed = 0;
 static int failed = 0;
@@ -38,6 +39,16 @@ bool check_is_there(int key, Slot result){
     }
 }
 
+bool check_is_there_no_printf(int key, Slot result){
+    if(!result.used){
+        return false;
+    }
+    else{
+        if(result.key != key) return false;
+        return true;
+    }
+}
+
 void check_not_found(const char *label, Slot result)
 {
     if (!result.used) {
@@ -66,8 +77,13 @@ void print_error(HashMapError error){
     }
 }
 
+int rand_number(int min, int max){
+    return (rand() % (max + 1)) + min;
+}
+
 int main(void)
 {
+    srand(time(NULL));
     HashMap *map = create_hash_map(10);
     HashMapError error;
 
@@ -134,8 +150,6 @@ int main(void)
 
     print_error(error);
     
-//    print_shape_map(map);
-
     /* delete key form hash map */
     error = delete_from_map(map, -1);
     print_error(error);
@@ -218,8 +232,6 @@ int main(void)
         failed += 1;
     }
 
-    print_map(map);
-
     /* write to map new overflow slot fail realloc
        (hash_slot 3 has key 3 in it) */
     fail_alloc_after = 0;
@@ -236,8 +248,116 @@ int main(void)
         failed += 1;
     }
 
-    print_map(map);
+    destroy_hash_map(map);
 
+    /* Volume Test */
+    map = create_hash_map(100);
+    int number_keys = 20000;
+
+    int keys[number_keys];
+
+    bool pass = true;
+
+    error = HASH_MAP_OK;
+
+    for(int i = 0; i < number_keys; i++){
+        keys[i] = rand_number(-16000, 16000);
+        error = write_to_map(map, keys[i], &i);
+        if(error != HASH_MAP_OK){
+            printf("[FAILED] write at key=%d\n", keys[i]);
+            pass = false;
+            failed += 1;
+        }
+    }
+    if(pass == true){
+        printf("[PASSED] writing keys passed\n");
+        passed += 1;
+    }
+    pass = true;
+
+    for(int i = 0; i < number_keys; i++){
+        if(!check_is_there_no_printf(keys[i], read_from_map(map, keys[i]))){
+            printf("[FAILED] read at key=%d\n", keys[i]);
+            pass = false;
+            failed += 1;
+        }
+    }
+    if(pass == true){
+        printf("[PASSED] reading keys passed\n");
+        passed += 1;
+    }
+    pass = true;
+
+    print_shape_map(map);
+
+    int number_keys_to_delete = number_keys / 2;
+
+    int keys_to_delete[number_keys_to_delete];
+
+    for(int i = 0; i < number_keys_to_delete; i++){
+        keys_to_delete[i] = rand_number(0, number_keys);
+        error = delete_from_map(map, keys[keys_to_delete[i]]);
+        if(error != HASH_MAP_OK){
+            printf("[FAILED] delete key=%d\n", keys[keys_to_delete[i]]);
+            pass = false;
+            failed += 1;
+        }
+    }
+    if(pass == true){
+        printf("[PASSED] deleting keys passed\n");
+        passed += 1;
+    }
+    pass = true;
+
+    for(int i = 0; i < number_keys_to_delete; i++){
+        if(check_is_there_no_printf(keys[keys_to_delete[i]], read_from_map(map, keys[keys_to_delete[i]]))){
+            printf("[FAILED] found key=%d after deleting\n", keys[keys_to_delete[i]]);
+            pass = false;
+            failed += 1;
+        }
+        
+    }
+    if(pass == true){
+        printf("[PASSED] didn't find keys after deleting\n");
+        passed += 1;
+    }
+    pass = true;
+
+    print_shape_map(map);
+
+    for(int i = 0; i < number_keys_to_delete; i++){
+        error = write_to_map(map, keys[keys_to_delete[i]], &i);
+        if(error != HASH_MAP_OK){
+            printf("[FAILED] delete key=%d\n", keys[keys_to_delete[i]]);
+            pass = false;
+            failed += 1;
+        }
+    }
+    if(pass == true){
+        printf("[PASSED] deleting keys passed\n");
+        passed += 1;
+    }
+    pass = true;
+
+    map = rehash(map);
+
+    //print_shape_map(map);
+
+    for(int i = 0; i < number_keys; i++){
+        if(!check_is_there_no_printf(keys[i], read_from_map(map, keys[i]))){
+            printf("[FAILED] read at key=%d after rehash\n", keys[i]);
+            pass = false;
+            failed += 1;
+        }
+    }
+    if(pass == true){
+        printf("[PASSED] reading keys after rehash passed\n");
+        passed += 1;
+    }
+
+    pass = true;
+    
+    
     printf("\n%d passed, %d failed\n", passed, failed);
     destroy_hash_map(map);
     return failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
